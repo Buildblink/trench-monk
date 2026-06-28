@@ -10,12 +10,24 @@ import { CouncilLoading } from "@/components/CouncilLoading";
 import { CouncilError } from "@/components/CouncilError";
 import { KarmaMapLite } from "@/components/KarmaMapLite";
 import { MakeVowButton } from "@/components/MakeVowButton";
+import { Badge } from "@/components/ui/Badge";
 import type { MonkCouncilResponse } from "@/app/api/monk-council/route";
 import type { CouncilResult } from "@/lib/monk/schemas";
-import type { ScanResponse } from "@/lib/types";
+import type { RecentScanResponse, ScanResponse } from "@/lib/types";
 
 interface SermonPageClientProps {
   tokenAddress: string;
+}
+
+type SermonSource = "live" | "saved" | null;
+
+function formatMinutesAgo(isoDate: string): string {
+  const created = new Date(isoDate).getTime();
+  const minutes = Math.max(0, Math.floor((Date.now() - created) / 60_000));
+
+  if (minutes < 1) return "just now";
+  if (minutes === 1) return "1 minute ago";
+  return `${minutes} minutes ago`;
 }
 
 export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
@@ -26,34 +38,85 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
   const [councilLoading, setCouncilLoading] = useState(false);
   const [councilError, setCouncilError] = useState<string | null>(null);
   const [council, setCouncil] = useState<CouncilResult | null>(null);
+  const [sermonSource, setSermonSource] = useState<SermonSource>(null);
+  const [sermonReceivedAt, setSermonReceivedAt] = useState<string | null>(
+    null
+  );
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchCouncil = useCallback(async (data: NonNullable<ScanResponse["data"]>) => {
-    setCouncilLoading(true);
-    setCouncilError(null);
+  const fetchCouncil = useCallback(
+    async (
+      data: NonNullable<ScanResponse["data"]>,
+      options?: { forceRefresh?: boolean }
+    ) => {
+      const forceRefresh = options?.forceRefresh ?? false;
 
-    try {
-      const res = await fetch("/api/monk-council", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tokenData: data }),
-      });
-      const json: MonkCouncilResponse = await res.json();
-
-      if (!json.success || !json.data) {
-        setCouncil(null);
-        setCouncilError(
-          json.error ?? "The Monk Council could not complete the reading."
-        );
+      if (forceRefresh) {
+        setRefreshing(true);
       } else {
-        setCouncil(json.data);
+        setCouncilLoading(true);
       }
-    } catch {
-      setCouncil(null);
-      setCouncilError("Network error while summoning the Monk Council.");
-    } finally {
-      setCouncilLoading(false);
-    }
-  }, []);
+      setCouncilError(null);
+
+      try {
+        const res = await fetch("/api/monk-council", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tokenData: data, forceRefresh }),
+        });
+        const json: MonkCouncilResponse = await res.json();
+
+        if (!json.success || !json.data) {
+          setCouncil(null);
+          setSermonSource(null);
+          setSermonReceivedAt(null);
+          setCouncilError(
+            json.error ?? "The Monk Council could not complete the reading."
+          );
+        } else {
+          setCouncil(json.data);
+          setSermonSource(json.fromCache ? "saved" : "live");
+          setSermonReceivedAt(json.createdAt ?? new Date().toISOString());
+        }
+      } catch {
+        setCouncil(null);
+        setSermonSource(null);
+        setSermonReceivedAt(null);
+        setCouncilError("Network error while summoning the Monk Council.");
+      } finally {
+        setCouncilLoading(false);
+        setRefreshing(false);
+      }
+    },
+    []
+  );
+
+  const loadRecentOrCouncil = useCallback(
+    async (data: NonNullable<ScanResponse["data"]>) => {
+      setCouncilLoading(true);
+      setCouncilError(null);
+
+      try {
+        const recentRes = await fetch(
+          `/api/scans/recent?tokenAddress=${encodeURIComponent(tokenAddress)}`
+        );
+        const recentJson: RecentScanResponse = await recentRes.json();
+
+        if (recentJson.success && recentJson.scan) {
+          setCouncil(recentJson.scan.council);
+          setSermonSource("saved");
+          setSermonReceivedAt(recentJson.scan.createdAt);
+          setCouncilLoading(false);
+          return;
+        }
+      } catch {
+        // Fall through to live council — persistence offline is non-fatal.
+      }
+
+      await fetchCouncil(data);
+    },
+    [tokenAddress, fetchCouncil]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -63,6 +126,8 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
       setScanError(null);
       setCouncil(null);
       setCouncilError(null);
+      setSermonSource(null);
+      setSermonReceivedAt(null);
 
       try {
         const res = await fetch(
@@ -77,7 +142,7 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
           setTokenData(null);
         } else {
           setTokenData(json.data);
-          fetchCouncil(json.data);
+          await loadRecentOrCouncil(json.data);
         }
       } catch {
         if (!cancelled) {
@@ -92,7 +157,12 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
     return () => {
       cancelled = true;
     };
-  }, [tokenAddress, fetchCouncil]);
+  }, [tokenAddress, loadRecentOrCouncil]);
+
+  const handleRefreshSermon = () => {
+    if (!tokenData || refreshing || councilLoading) return;
+    fetchCouncil(tokenData, { forceRefresh: true });
+  };
 
   return (
     <div className="mx-auto max-w-4xl overflow-x-hidden px-4 py-8 sm:px-6 sm:py-10">
@@ -103,12 +173,25 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
         >
           ← Back to Temple
         </Link>
-        <h1 className="mt-4 text-2xl font-bold text-monk-text sm:text-3xl">
-          <span className="text-gradient-solana">Sermon</span>
-        </h1>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold text-monk-text sm:text-3xl">
+            <span className="text-gradient-solana">Sermon</span>
+          </h1>
+          {sermonSource === "live" && (
+            <Badge variant="green">Live Sermon</Badge>
+          )}
+          {sermonSource === "saved" && (
+            <Badge variant="purple">Saved Sermon</Badge>
+          )}
+        </div>
         <p className="mt-1 text-sm text-monk-muted sm:text-base">
           The Monk Council reads the token. The chart has not yet spoken.
         </p>
+        {sermonSource === "saved" && sermonReceivedAt && (
+          <p className="mt-1 text-xs text-monk-muted">
+            Sermon received {formatMinutesAgo(sermonReceivedAt)}
+          </p>
+        )}
       </header>
 
       {scanLoading && (
@@ -147,6 +230,17 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
 
           {council && !councilLoading && (
             <>
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleRefreshSermon}
+                  disabled={refreshing}
+                  className="rounded-lg border border-temple-border bg-temple-surface px-3 py-1.5 text-xs font-medium text-monk-muted transition-colors hover:border-solana-purple/40 hover:text-monk-text disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
+                >
+                  {refreshing ? "Refreshing..." : "Refresh Sermon"}
+                </button>
+              </div>
+
               <MonkVerdict verdict={council.finalMonk} />
 
               <DataCoverage

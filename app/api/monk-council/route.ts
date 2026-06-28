@@ -5,7 +5,10 @@ import {
   CouncilUnavailableError,
   isCouncilConfigured,
 } from "@/lib/monk/client";
+import { buildPreAnalysis } from "@/lib/monk/pre-analysis";
 import { runCouncil } from "@/lib/monk/run-council";
+import { getRecentScan } from "@/lib/scans/get-recent-scan";
+import { saveScan } from "@/lib/scans/save-scan";
 import type { TokenData } from "@/lib/types";
 import type { CouncilResult } from "@/lib/monk/schemas";
 
@@ -14,6 +17,9 @@ export interface MonkCouncilResponse {
   data?: CouncilResult;
   error?: string;
   configured?: boolean;
+  scanId?: string;
+  fromCache?: boolean;
+  createdAt?: string;
 }
 
 function isTokenData(value: unknown): value is TokenData {
@@ -37,6 +43,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+    const forceRefresh = body?.forceRefresh === true;
     let tokenData: TokenData | null = null;
 
     if (isTokenData(body?.tokenData)) {
@@ -72,12 +79,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!forceRefresh) {
+      const recent = await getRecentScan(tokenData.tokenAddress);
+      if (recent) {
+        return NextResponse.json<MonkCouncilResponse>({
+          success: true,
+          configured: true,
+          data: recent.council,
+          scanId: recent.id,
+          fromCache: true,
+          createdAt: recent.createdAt,
+        });
+      }
+    }
+
     const data = await runCouncil(tokenData);
+
+    const preAnalysis = buildPreAnalysis(tokenData);
+    const saved = await saveScan({ tokenData, council: data, preAnalysis });
 
     return NextResponse.json<MonkCouncilResponse>({
       success: true,
       configured: true,
       data,
+      scanId: saved?.id,
+      fromCache: false,
+      createdAt: new Date().toISOString(),
     });
   } catch (error) {
     if (error instanceof CouncilUnavailableError) {

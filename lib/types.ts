@@ -1,3 +1,5 @@
+import type { CouncilResult } from "@/lib/monk/schemas";
+
 export interface TokenData {
   tokenAddress: string;
   chain: string;
@@ -31,4 +33,19 @@ export interface ScanResponse {
   success: boolean;
   data?: TokenData;
   error?: string;
+}
+
+/** Hydrated saved scan — council output ready for UI components. */
+export interface SavedScanRecord {
+  id: string;
+  tokenAddress: string;
+  createdAt: string;
+  council: CouncilResult;
+}
+
+export interface RecentScanResponse {
+  success: boolean;
+  scan: SavedScanRecord | null;
+  error?: string;
+  persistenceAvailable?: boolean;
 }
