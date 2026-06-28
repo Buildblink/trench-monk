@@ -29,6 +29,8 @@ export async function runCouncil(tokenData: TokenData): Promise<CouncilResult> {
     dataCoverage: {
       available: dataCoverage.available,
       missing: dataCoverage.missing,
+      contextTiers: dataCoverage.contextTiers,
+      pairLiquidityDisclaimer: dataCoverage.pairLiquidityDisclaimer,
     },
   };
 }

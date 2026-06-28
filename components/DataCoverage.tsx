@@ -1,8 +1,15 @@
 import type { AgentOutput } from "@/lib/monk/schemas";
+import { formatTierLabel } from "@/lib/format";
 
 interface DataCoverageProps {
   available: string[];
   missing: string[];
+  contextTiers?: {
+    size_tier: string;
+    liquidity_tier: string;
+    pair_age_tier: string;
+  };
+  pairLiquidityDisclaimer?: string;
   agents?: {
     devDetective: AgentOutput;
     walletMonk: AgentOutput;
@@ -10,15 +17,40 @@ interface DataCoverageProps {
   };
 }
 
-export function DataCoverage({ available, missing, agents }: DataCoverageProps) {
+export function DataCoverage({
+  available,
+  missing,
+  contextTiers,
+  pairLiquidityDisclaimer,
+  agents,
+}: DataCoverageProps) {
   return (
     <section className="rounded-2xl border border-temple-border bg-temple-surface/40 p-6">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-monk-text">Data Coverage</h2>
         <p className="mt-1 text-sm text-monk-muted">
-          The Monk only speaks from data it can see. Unknowns are not invented.
+          The Monk only speaks from available data. Unknowns are not invented.
         </p>
+        {pairLiquidityDisclaimer && (
+          <p className="mt-2 rounded-lg border border-temple-border/60 bg-temple-bg/50 px-3 py-2 text-xs leading-relaxed text-monk-muted">
+            {pairLiquidityDisclaimer}
+          </p>
+        )}
       </div>
+
+      {contextTiers && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          <span className="rounded-full border border-solana-purple/30 bg-solana-purple/10 px-3 py-1 text-xs text-solana-purple">
+            Size: {formatTierLabel(contextTiers.size_tier)}
+          </span>
+          <span className="rounded-full border border-solana-green/30 bg-solana-green/10 px-3 py-1 text-xs text-solana-green">
+            Selected pair liquidity: {formatTierLabel(contextTiers.liquidity_tier)}
+          </span>
+          <span className="rounded-full border border-candle-orange/30 bg-candle-orange/10 px-3 py-1 text-xs text-candle-glow">
+            Pair age: {formatTierLabel(contextTiers.pair_age_tier)}
+          </span>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-solana-green/25 bg-solana-green/5 p-4">
@@ -37,15 +69,18 @@ export function DataCoverage({ available, missing, agents }: DataCoverageProps) 
           </ul>
         </div>
 
-        <div className="rounded-xl border border-candle-orange/25 bg-candle-orange/5 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-candle-glow">
-            Unknown — not in current data
+        <div className="rounded-xl border border-temple-border bg-temple-elevated/30 p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-monk-muted">
+            Not in current data
           </h3>
+          <p className="mt-1 text-xs text-monk-muted/70">
+            Absence here is normal — the Council will not pretend to see these.
+          </p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {missing.map((item) => (
               <li
                 key={item}
-                className="rounded-full border border-temple-border bg-temple-elevated/80 px-2.5 py-0.5 text-xs text-monk-muted"
+                className="rounded-full border border-temple-border bg-temple-bg/60 px-2.5 py-0.5 text-xs text-monk-muted"
               >
                 {item}
               </li>
@@ -84,7 +119,7 @@ export function DataCoverage({ available, missing, agents }: DataCoverageProps) 
                       key={`${agent.agent}-miss-${d}`}
                       className="text-xs text-monk-muted"
                     >
-                      ? {d}
+                      ○ {d}
                     </span>
                   ))}
                   {agent.data_missing.length > 5 && (

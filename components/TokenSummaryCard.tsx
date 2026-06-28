@@ -99,7 +99,7 @@ export function TokenSummaryCard({ data }: TokenSummaryCardProps) {
         <StatCell label="Price" value={formatUsd(data.priceUsd)} />
         <StatCell label="Market Cap" value={formatUsd(data.marketCap)} />
         <StatCell label="FDV" value={formatUsd(data.fdv)} />
-        <StatCell label="Liquidity" value={formatUsd(data.liquidityUsd)} />
+        <StatCell label="Selected Pair Liquidity" value={formatUsd(data.liquidityUsd)} />
         <StatCell
           label="Vol 24H"
           value={formatUsd(data.volume24h)}
@@ -122,6 +122,11 @@ export function TokenSummaryCard({ data }: TokenSummaryCardProps) {
           value={data.chain.charAt(0).toUpperCase() + data.chain.slice(1)}
         />
       </div>
+
+      <p className="mt-3 text-xs text-monk-muted/70">
+        Liquidity is for the selected DexScreener pair only — not necessarily
+        total token liquidity across all pools or CEXs.
+      </p>
 
       {(data.website || data.twitter || data.telegram) && (
         <div className="mt-4 flex flex-wrap gap-3 border-t border-temple-border/60 pt-4">

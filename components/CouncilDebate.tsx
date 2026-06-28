@@ -79,7 +79,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 
       {agent.data_missing.length > 0 && (
         <div className="mt-3 rounded-lg border border-temple-border/50 bg-temple-elevated/40 px-3 py-2">
-          <div className="text-xs text-monk-muted">Could not assess</div>
+          <div className="text-xs text-monk-muted">Not in current data</div>
           <p className="mt-1 text-xs text-monk-muted/80">
             {agent.data_missing.slice(0, 4).join(" · ")}
             {agent.data_missing.length > 4 &&

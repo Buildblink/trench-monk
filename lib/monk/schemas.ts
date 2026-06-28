@@ -8,13 +8,13 @@ export const agentOutputSchema = z.object({
   agent: z.string(),
   subtitle: z.string(),
   risk_level: riskLevelSchema,
-  observations: z.array(z.string()).min(1).max(6),
-  warnings: z.array(z.string()).max(5),
+  observations: z.array(z.string()).min(1).max(3),
+  warnings: z.array(z.string()).max(2),
   monk_line: z.string(),
   data_available: z.array(z.string()).min(1).max(20),
   data_missing: z.array(z.string()).min(1).max(20),
   confidence: confidenceSchema,
-  evidence: z.array(z.string()).min(1).max(6),
+  evidence: z.array(z.string()).min(1).max(3),
 });
 
 export const devDetectiveSchema = agentOutputSchema.extend({
@@ -65,11 +65,11 @@ export const finalMonkSchema = z.object({
   clarity_score: z.number().min(0).max(100),
   main_danger: z.string(),
   summary: z.string(),
-  what_to_watch_next: z.array(z.string()).min(1).max(6),
+  what_to_watch_next: z.array(z.string()).min(1).max(4),
   call_difficulty: callDifficultySchema,
   monk_quote: z.string(),
   disclaimer: z.string(),
-  data_limitations: z.array(z.string()).min(1).max(8),
+  data_limitations: z.array(z.string()).min(1).max(6),
   confidence: confidenceSchema,
   best_use_case: bestUseCaseSchema,
 });
@@ -97,5 +97,11 @@ export interface CouncilResult extends CouncilOutput {
   dataCoverage: {
     available: string[];
     missing: string[];
+    contextTiers: {
+      size_tier: string;
+      liquidity_tier: string;
+      pair_age_tier: string;
+    };
+    pairLiquidityDisclaimer: string;
   };
 }

@@ -150,6 +150,10 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
               <DataCoverage
                 available={council.dataCoverage.available}
                 missing={council.dataCoverage.missing}
+                contextTiers={council.dataCoverage.contextTiers}
+                pairLiquidityDisclaimer={
+                  council.dataCoverage.pairLiquidityDisclaimer
+                }
                 agents={{
                   devDetective: council.devDetective,
                   walletMonk: council.walletMonk,
