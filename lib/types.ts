@@ -49,3 +49,45 @@ export interface RecentScanResponse {
   error?: string;
   persistenceAvailable?: boolean;
 }
+
+export interface VowRecord {
+  id: string;
+  scanId: string | null;
+  tokenAddress: string;
+  walletAddress: string | null;
+  username: string | null;
+  callType: string;
+  callReason: string | null;
+  monkVerdictAtCall: string | null;
+  initialMarketCap: number | null;
+  initialLiquidityUsd: number | null;
+  initialPriceUsd: number | null;
+  initialFdv: number | null;
+  resolve1hAt: string;
+  resolve3hAt: string;
+  resolve24hAt: string;
+  result1h: string;
+  result3h: string;
+  result24h: string;
+  wisdomAwarded: number;
+  beatMonk: boolean;
+  createdAt: string;
+}
+
+export interface CreateVowInput {
+  scanId?: string | null;
+  tokenAddress: string;
+  username?: string | null;
+  walletAddress?: string | null;
+  callType: string;
+  callReason?: string | null;
+  monkVerdictAtCall: string;
+  tokenData: TokenData;
+}
+
+export interface VowsResponse {
+  success: boolean;
+  vows?: VowRecord[];
+  vow?: VowRecord;
+  error?: string;
+}

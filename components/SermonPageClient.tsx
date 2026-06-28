@@ -10,6 +10,7 @@ import { CouncilLoading } from "@/components/CouncilLoading";
 import { CouncilError } from "@/components/CouncilError";
 import { KarmaMapLite } from "@/components/KarmaMapLite";
 import { MakeVowButton } from "@/components/MakeVowButton";
+import { RecentVows } from "@/components/RecentVows";
 import { Badge } from "@/components/ui/Badge";
 import type { MonkCouncilResponse } from "@/app/api/monk-council/route";
 import type { CouncilResult } from "@/lib/monk/schemas";
@@ -43,6 +44,8 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
     null
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [scanId, setScanId] = useState<string | null>(null);
+  const [vowsRefreshKey, setVowsRefreshKey] = useState(0);
 
   const fetchCouncil = useCallback(
     async (
@@ -70,6 +73,7 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
           setCouncil(null);
           setSermonSource(null);
           setSermonReceivedAt(null);
+          setScanId(null);
           setCouncilError(
             json.error ?? "The Monk Council could not complete the reading."
           );
@@ -77,11 +81,13 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
           setCouncil(json.data);
           setSermonSource(json.fromCache ? "saved" : "live");
           setSermonReceivedAt(json.createdAt ?? new Date().toISOString());
+          setScanId(json.scanId ?? null);
         }
       } catch {
         setCouncil(null);
         setSermonSource(null);
         setSermonReceivedAt(null);
+        setScanId(null);
         setCouncilError("Network error while summoning the Monk Council.");
       } finally {
         setCouncilLoading(false);
@@ -106,6 +112,7 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
           setCouncil(recentJson.scan.council);
           setSermonSource("saved");
           setSermonReceivedAt(recentJson.scan.createdAt);
+          setScanId(recentJson.scan.id);
           setCouncilLoading(false);
           return;
         }
@@ -128,6 +135,7 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
       setCouncilError(null);
       setSermonSource(null);
       setSermonReceivedAt(null);
+      setScanId(null);
 
       try {
         const res = await fetch(
@@ -158,6 +166,10 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
       cancelled = true;
     };
   }, [tokenAddress, loadRecentOrCouncil]);
+
+  const handleVowCreated = () => {
+    setVowsRefreshKey((key) => key + 1);
+  };
 
   const handleRefreshSermon = () => {
     if (!tokenData || refreshing || councilLoading) return;
@@ -263,7 +275,17 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
             <KarmaMapLite council={null} />
           )}
 
-          <MakeVowButton />
+          {council && !councilLoading && (
+            <MakeVowButton
+              tokenAddress={tokenAddress}
+              tokenData={tokenData}
+              scanId={scanId}
+              monkVerdict={council.finalMonk.verdict}
+              onVowCreated={handleVowCreated}
+            />
+          )}
+
+          <RecentVows tokenAddress={tokenAddress} refreshKey={vowsRefreshKey} />
         </div>
       )}
     </div>
