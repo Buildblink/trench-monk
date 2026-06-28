@@ -1,8 +1,5 @@
 import type { TokenData } from "@/lib/types";
-import {
-  runStructuredAgent,
-  serializeTokenDataForAgents,
-} from "@/lib/monk/client";
+import { buildAgentPayload, runStructuredAgent } from "@/lib/monk/client";
 import { FINAL_MONK_SYSTEM } from "@/lib/monk/prompts";
 import type {
   DevDetectiveOutput,
@@ -23,7 +20,7 @@ export async function runFinalMonk(
   agents: AgentInputs
 ): Promise<FinalMonkOutput> {
   const payload = {
-    tokenData: serializeTokenDataForAgents(tokenData),
+    ...buildAgentPayload(tokenData),
     council: agents,
   };
 

@@ -7,11 +7,11 @@ import {
 } from "@/lib/monk/client";
 import { runCouncil } from "@/lib/monk/run-council";
 import type { TokenData } from "@/lib/types";
-import type { CouncilOutput } from "@/lib/monk/schemas";
+import type { CouncilResult } from "@/lib/monk/schemas";
 
 export interface MonkCouncilResponse {
   success: boolean;
-  data?: CouncilOutput;
+  data?: CouncilResult;
   error?: string;
   configured?: boolean;
 }

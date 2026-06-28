@@ -1,7 +1,7 @@
-import type { CouncilOutput, RiskLevel } from "@/lib/monk/schemas";
+import type { CouncilResult, RiskLevel } from "@/lib/monk/schemas";
 
 interface KarmaMapLiteProps {
-  council?: CouncilOutput | null;
+  council?: CouncilResult | null;
 }
 
 function riskColor(level: RiskLevel) {
@@ -50,22 +50,26 @@ export function KarmaMapLite({ council }: KarmaMapLiteProps) {
           label: "Dev Risk",
           level: council.devDetective.risk_level,
           description: council.devDetective.monk_line,
+          confidence: council.devDetective.confidence,
         },
         {
           label: "Liquidity Risk",
           level: council.walletMonk.risk_level,
           description: council.walletMonk.observations[0] ?? "Pool karma read.",
+          confidence: council.walletMonk.confidence,
         },
         {
           label: "Holder Risk",
           level: "unknown" as RiskLevel,
           description:
             "Top holders and wallet clustering unknown from current data.",
+          confidence: "low" as const,
         },
         {
           label: "Narrative Risk",
           level: council.narrativeOracle.risk_level,
           description: council.narrativeOracle.monk_line,
+          confidence: council.narrativeOracle.confidence,
         },
       ]
     : [
@@ -73,21 +77,25 @@ export function KarmaMapLite({ council }: KarmaMapLiteProps) {
           label: "Dev Risk",
           level: "unknown" as RiskLevel,
           description: "Awaiting Council reading",
+          confidence: null,
         },
         {
           label: "Liquidity Risk",
           level: "unknown" as RiskLevel,
           description: "Awaiting Council reading",
+          confidence: null,
         },
         {
           label: "Holder Risk",
           level: "unknown" as RiskLevel,
           description: "Wallet karma unavailable",
+          confidence: null,
         },
         {
           label: "Narrative Risk",
           level: "unknown" as RiskLevel,
           description: "Awaiting Council reading",
+          confidence: null,
         },
       ];
 
@@ -112,15 +120,22 @@ export function KarmaMapLite({ council }: KarmaMapLiteProps) {
             key={risk.label}
             className="rounded-xl border border-temple-border/80 bg-temple-bg/40 p-4"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-monk-text">
                 {risk.label}
               </span>
-              <span
-                className={`rounded-full border px-2 py-0.5 text-xs capitalize ${riskColor(risk.level)}`}
-              >
-                {risk.level}
-              </span>
+              <div className="flex items-center gap-2">
+                {risk.confidence && (
+                  <span className="text-xs capitalize text-monk-muted/70">
+                    {risk.confidence} conf.
+                  </span>
+                )}
+                <span
+                  className={`rounded-full border px-2 py-0.5 text-xs capitalize ${riskColor(risk.level)}`}
+                >
+                  {risk.level}
+                </span>
+              </div>
             </div>
             <p className="mt-2 text-xs text-monk-muted line-clamp-2">
               {risk.description}

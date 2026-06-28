@@ -1,4 +1,5 @@
 import type { FinalMonkOutput, Verdict } from "@/lib/monk/schemas";
+import { confidenceBadgeClass } from "@/components/council-styles";
 
 const VERDICT_STYLES: Record<
   Verdict,
@@ -81,14 +82,22 @@ export function MonkVerdict({ verdict }: MonkVerdictProps) {
       </div>
 
       <div className="rounded-xl border border-temple-border/60 bg-temple-bg/60 p-5">
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <span
             className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${styles.badge}`}
           >
             {verdict.verdict}
           </span>
+          <span
+            className={`rounded-full border px-3 py-1 text-xs capitalize ${confidenceBadgeClass(verdict.confidence)}`}
+          >
+            {verdict.confidence} confidence
+          </span>
           <span className="rounded-full border border-temple-border bg-temple-elevated px-3 py-1 text-xs capitalize text-monk-muted">
             {verdict.call_difficulty} call
+          </span>
+          <span className="rounded-full border border-solana-purple/30 bg-solana-purple/10 px-3 py-1 text-xs text-solana-purple">
+            {verdict.best_use_case}
           </span>
         </div>
 
@@ -112,13 +121,26 @@ export function MonkVerdict({ verdict }: MonkVerdictProps) {
           </div>
         </div>
 
-        <div className="mt-5 rounded-lg bg-red-500/5 border border-red-500/20 p-3">
+        <div className="mt-5 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
           <div className="text-xs uppercase tracking-wider text-red-400/80">
             Main Danger
           </div>
           <p className="mt-1 text-sm font-medium text-monk-text">
             {verdict.main_danger}
           </p>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-temple-border/60 bg-temple-elevated/40 p-3">
+          <div className="text-xs uppercase tracking-wider text-monk-muted">
+            Data Limitations
+          </div>
+          <ul className="mt-2 space-y-1">
+            {verdict.data_limitations.map((item, i) => (
+              <li key={i} className="text-sm text-monk-muted">
+                — {item}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <p className="mt-5 text-sm leading-relaxed text-monk-text/90">
@@ -135,10 +157,7 @@ export function MonkVerdict({ verdict }: MonkVerdictProps) {
           </div>
           <ul className="mt-2 space-y-2">
             {verdict.what_to_watch_next.map((item, i) => (
-              <li
-                key={i}
-                className="flex gap-2 text-sm text-monk-text/90"
-              >
+              <li key={i} className="flex gap-2 text-sm text-monk-text/90">
                 <span className="text-solana-green">→</span>
                 <span>{item}</span>
               </li>

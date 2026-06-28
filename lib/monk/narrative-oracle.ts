@@ -1,8 +1,10 @@
 import type { TokenData } from "@/lib/types";
 import {
+  buildAgentPayload,
+  enforceAgentDataCoverage,
   runStructuredAgent,
-  serializeTokenDataForAgents,
 } from "@/lib/monk/client";
+import { buildPreAnalysis } from "@/lib/monk/pre-analysis";
 import { NARRATIVE_ORACLE_SYSTEM } from "@/lib/monk/prompts";
 import {
   narrativeOracleSchema,
@@ -12,12 +14,15 @@ import {
 export async function runNarrativeOracle(
   tokenData: TokenData
 ): Promise<NarrativeOracleOutput> {
-  const payload = serializeTokenDataForAgents(tokenData);
+  const payload = buildAgentPayload(tokenData);
+  const preAnalysis = buildPreAnalysis(tokenData);
 
-  return runStructuredAgent(
+  const result = await runStructuredAgent(
     narrativeOracleSchema,
     "narrative_oracle",
     NARRATIVE_ORACLE_SYSTEM,
     JSON.stringify(payload, null, 2)
   );
+
+  return enforceAgentDataCoverage(result, preAnalysis);
 }

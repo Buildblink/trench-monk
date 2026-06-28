@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { TokenSummaryCard } from "@/components/TokenSummaryCard";
+import { DataCoverage } from "@/components/DataCoverage";
 import { CouncilDebate } from "@/components/CouncilDebate";
 import { MonkVerdict } from "@/components/MonkVerdict";
 import { CouncilLoading } from "@/components/CouncilLoading";
@@ -10,7 +11,7 @@ import { CouncilError } from "@/components/CouncilError";
 import { KarmaMapLite } from "@/components/KarmaMapLite";
 import { MakeVowButton } from "@/components/MakeVowButton";
 import type { MonkCouncilResponse } from "@/app/api/monk-council/route";
-import type { CouncilOutput } from "@/lib/monk/schemas";
+import type { CouncilResult } from "@/lib/monk/schemas";
 import type { ScanResponse } from "@/lib/types";
 
 interface SermonPageClientProps {
@@ -24,7 +25,7 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
 
   const [councilLoading, setCouncilLoading] = useState(false);
   const [councilError, setCouncilError] = useState<string | null>(null);
-  const [council, setCouncil] = useState<CouncilOutput | null>(null);
+  const [council, setCouncil] = useState<CouncilResult | null>(null);
 
   const fetchCouncil = useCallback(async (data: NonNullable<ScanResponse["data"]>) => {
     setCouncilLoading(true);
@@ -146,6 +147,15 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
 
           {council && !councilLoading && (
             <>
+              <DataCoverage
+                available={council.dataCoverage.available}
+                missing={council.dataCoverage.missing}
+                agents={{
+                  devDetective: council.devDetective,
+                  walletMonk: council.walletMonk,
+                  narrativeOracle: council.narrativeOracle,
+                }}
+              />
               <CouncilDebate
                 devDetective={council.devDetective}
                 walletMonk={council.walletMonk}

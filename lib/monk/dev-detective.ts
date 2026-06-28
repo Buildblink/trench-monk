@@ -1,8 +1,10 @@
 import type { TokenData } from "@/lib/types";
 import {
+  buildAgentPayload,
+  enforceAgentDataCoverage,
   runStructuredAgent,
-  serializeTokenDataForAgents,
 } from "@/lib/monk/client";
+import { buildPreAnalysis } from "@/lib/monk/pre-analysis";
 import { DEV_DETECTIVE_SYSTEM } from "@/lib/monk/prompts";
 import {
   devDetectiveSchema,
@@ -12,12 +14,15 @@ import {
 export async function runDevDetective(
   tokenData: TokenData
 ): Promise<DevDetectiveOutput> {
-  const payload = serializeTokenDataForAgents(tokenData);
+  const payload = buildAgentPayload(tokenData);
+  const preAnalysis = buildPreAnalysis(tokenData);
 
-  return runStructuredAgent(
+  const result = await runStructuredAgent(
     devDetectiveSchema,
     "dev_detective",
     DEV_DETECTIVE_SYSTEM,
     JSON.stringify(payload, null, 2)
   );
+
+  return enforceAgentDataCoverage(result, preAnalysis);
 }
