@@ -31,7 +31,7 @@ export function Header() {
         </nav>
 
         <div className="rounded-full border border-candle-orange/30 bg-candle-orange/10 px-3 py-1 text-xs text-candle-glow">
-          Phase 2 · Council Live
+          Phase 2 · Temple Open
         </div>
       </div>
     </header>

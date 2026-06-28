@@ -80,3 +80,35 @@ body {
 .animate-float {
   animation: float 4s ease-in-out infinite;
 }
+
+.verdict-hero {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      color-mix(in srgb, var(--color-candle-orange) 12%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--color-temple-surface) 95%, transparent),
+      color-mix(in srgb, var(--color-temple-elevated) 80%, transparent)
+    );
+}
+
+.clarity-ring {
+  background: conic-gradient(
+    var(--ring-color) calc(var(--score) * 1%),
+    color-mix(in srgb, var(--color-temple-border) 80%, transparent) 0
+  );
+}
+
+.ritual-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-solana-purple) 40%, transparent),
+    color-mix(in srgb, var(--color-candle-orange) 40%, transparent),
+    transparent
+  );
+}

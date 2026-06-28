@@ -1,174 +1,181 @@
 import type { FinalMonkOutput, Verdict } from "@/lib/monk/schemas";
-import { confidenceBadgeClass } from "@/components/council-styles";
+import { Badge } from "@/components/ui/Badge";
+import { MonkQuote } from "@/components/ui/MonkQuote";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
-const VERDICT_STYLES: Record<
+const VERDICT_ACCENT: Record<
   Verdict,
-  { badge: string; glow: string }
+  { glow: string; ring: string; text: string }
 > = {
   "Clear Mind": {
-    badge: "bg-solana-green/15 text-solana-green border-solana-green/40",
     glow: "glow-green",
+    ring: "#14f195",
+    text: "text-solana-green",
   },
   "Scalp Only": {
-    badge: "bg-candle-orange/15 text-candle-glow border-candle-orange/40",
     glow: "glow-candle",
+    ring: "#ffb347",
+    text: "text-candle-glow",
   },
   "Hungry Ghosts": {
-    badge: "bg-red-500/15 text-red-400 border-red-500/40",
     glow: "",
+    ring: "#f87171",
+    text: "text-red-400",
   },
   "Dev Karma": {
-    badge: "bg-solana-purple/15 text-solana-purple border-solana-purple/40",
     glow: "glow-purple",
+    ring: "#9945ff",
+    text: "text-solana-purple",
   },
   "False Temple": {
-    badge: "bg-red-500/15 text-red-400 border-red-500/40",
     glow: "",
+    ring: "#f87171",
+    text: "text-red-400",
   },
   "Dead Candle": {
-    badge: "bg-temple-elevated text-monk-muted border-temple-border",
     glow: "",
+    ring: "#8b8ba3",
+    text: "text-monk-muted",
   },
   "CTO Rebirth": {
-    badge: "bg-solana-purple/15 text-solana-purple border-solana-purple/40",
     glow: "glow-purple",
+    ring: "#9945ff",
+    text: "text-solana-purple",
   },
   "Exit Ceremony": {
-    badge: "bg-candle-orange/15 text-candle-glow border-candle-orange/40",
     glow: "glow-candle",
+    ring: "#ffb347",
+    text: "text-candle-glow",
   },
   "Do Not Ape": {
-    badge: "bg-red-500/15 text-red-400 border-red-500/40",
     glow: "",
+    ring: "#f87171",
+    text: "text-red-400",
   },
   "Meditate First": {
-    badge: "bg-temple-elevated text-monk-muted border-temple-border",
     glow: "",
+    ring: "#8b8ba3",
+    text: "text-monk-muted",
   },
 };
-
-function clarityColor(score: number): string {
-  if (score >= 70) return "text-solana-green";
-  if (score >= 40) return "text-candle-glow";
-  return "text-red-400";
-}
-
-function clarityRing(score: number): string {
-  if (score >= 70) return "border-solana-green/50";
-  if (score >= 40) return "border-candle-orange/50";
-  return "border-red-500/50";
-}
 
 interface MonkVerdictProps {
   verdict: FinalMonkOutput;
 }
 
 export function MonkVerdict({ verdict }: MonkVerdictProps) {
-  const styles = VERDICT_STYLES[verdict.verdict];
+  const accent = VERDICT_ACCENT[verdict.verdict];
 
   return (
     <section
-      className={`relative overflow-hidden rounded-2xl border border-candle-orange/30 bg-gradient-to-br from-temple-surface via-temple-elevated/50 to-temple-surface p-6 ${styles.glow}`}
+      className={`verdict-hero relative overflow-hidden rounded-3xl border border-candle-orange/35 p-6 sm:p-8 ${accent.glow}`}
     >
-      <div className="absolute right-4 top-4 text-4xl opacity-20 animate-float">
-        🧘
-      </div>
+      <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-solana-purple/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-10 left-1/4 h-32 w-32 rounded-full bg-candle-orange/10 blur-3xl" />
 
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-candle-glow">
-          Final Monk Verdict
-        </h2>
-        <p className="text-xs text-monk-muted">The one who does not ape</p>
-      </div>
+      <SectionHeader
+        eyebrow="The Monk has spoken"
+        title="Final Monk Verdict"
+        subtitle="The one who does not ape."
+      />
 
-      <div className="rounded-xl border border-temple-border/60 bg-temple-bg/60 p-5">
-        <div className="flex flex-wrap items-center gap-3">
-          <span
-            className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${styles.badge}`}
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
+        {/* Verdict + clarity */}
+        <div className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left">
+          <p
+            className={`text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl ${accent.text}`}
           >
             {verdict.verdict}
-          </span>
-          <span
-            className={`rounded-full border px-3 py-1 text-xs capitalize ${confidenceBadgeClass(verdict.confidence)}`}
-          >
-            {verdict.confidence} confidence
-          </span>
-          <span className="rounded-full border border-temple-border bg-temple-elevated px-3 py-1 text-xs capitalize text-monk-muted">
-            {verdict.call_difficulty} call
-          </span>
-          <span className="rounded-full border border-solana-purple/30 bg-solana-purple/10 px-3 py-1 text-xs text-solana-purple">
-            {verdict.best_use_case}
-          </span>
-        </div>
+          </p>
 
-        <div className="mt-5 flex items-center gap-5">
-          <div
-            className={`flex h-16 w-16 items-center justify-center rounded-full border-2 ${clarityRing(verdict.clarity_score)}`}
-          >
-            <span
-              className={`font-mono text-xl font-bold ${clarityColor(verdict.clarity_score)}`}
-            >
-              {verdict.clarity_score}
-            </span>
+          <div className="mt-5 flex flex-wrap justify-center gap-2 lg:justify-start">
+            <Badge variant="orange">{verdict.confidence} confidence</Badge>
+            <Badge variant="purple">{verdict.best_use_case}</Badge>
+            <Badge variant="muted">{verdict.call_difficulty} call</Badge>
           </div>
-          <div>
-            <div className="text-xs uppercase tracking-wider text-monk-muted">
-              Clarity Score
-            </div>
-            <div className="text-sm text-monk-text">
-              How clearly the Council sees this token
-            </div>
-          </div>
-        </div>
 
-        <div className="mt-5 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-          <div className="text-xs uppercase tracking-wider text-red-400/80">
-            Main Danger
-          </div>
-          <p className="mt-1 text-sm font-medium text-monk-text">
-            {verdict.main_danger}
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-monk-text/90 sm:text-lg">
+            {verdict.summary}
           </p>
         </div>
 
-        <div className="mt-4 rounded-lg border border-temple-border/60 bg-temple-elevated/40 p-3">
-          <div className="text-xs uppercase tracking-wider text-monk-muted">
-            Data Limitations
+        {/* Clarity ring */}
+        <div className="flex shrink-0 flex-col items-center">
+          <div
+            className="clarity-ring rounded-full p-[3px]"
+            style={
+              {
+                "--score": verdict.clarity_score,
+                "--ring-color": accent.ring,
+              } as Record<string, string | number>
+            }
+          >
+            <div className="flex h-28 w-28 flex-col items-center justify-center rounded-full bg-temple-bg sm:h-32 sm:w-32">
+              <span
+                className={`font-mono text-4xl font-bold sm:text-5xl ${accent.text}`}
+              >
+                {verdict.clarity_score}
+              </span>
+              <span className="mt-0.5 text-[10px] uppercase tracking-widest text-monk-muted">
+                Clarity
+              </span>
+            </div>
           </div>
-          <ul className="mt-2 space-y-1">
-            {verdict.data_limitations.map((item, i) => (
-              <li key={i} className="text-sm text-monk-muted">
-                — {item}
-              </li>
-            ))}
-          </ul>
         </div>
+      </div>
 
-        <p className="mt-5 text-sm leading-relaxed text-monk-text/90">
-          {verdict.summary}
+      <div className="ritual-divider my-8" />
+
+      {/* Main danger */}
+      <div className="rounded-xl border border-red-500/25 bg-red-500/5 px-5 py-4">
+        <p className="text-xs font-semibold uppercase tracking-widest text-red-400/90">
+          Main Danger
         </p>
-
-        <blockquote className="mt-5 border-l-2 border-candle-orange/50 pl-4 text-sm italic text-candle-glow/90">
-          &ldquo;{verdict.monk_quote}&rdquo;
-        </blockquote>
-
-        <div className="mt-5">
-          <div className="text-xs uppercase tracking-wider text-monk-muted">
-            What to Watch Next
-          </div>
-          <ul className="mt-2 space-y-2">
-            {verdict.what_to_watch_next.map((item, i) => (
-              <li key={i} className="flex gap-2 text-sm text-monk-text/90">
-                <span className="text-solana-green">→</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <p className="mt-6 border-t border-temple-border/50 pt-4 text-xs text-monk-muted/70">
-          {verdict.disclaimer}
+        <p className="mt-2 text-base font-medium leading-snug text-monk-text sm:text-lg">
+          {verdict.main_danger}
         </p>
       </div>
+
+      <div className="mt-6">
+        <MonkQuote quote={verdict.monk_quote} size="lg" />
+      </div>
+
+      <div className="mt-8">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-monk-muted">
+          What to Watch Next
+        </p>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {verdict.what_to_watch_next.map((item, i) => (
+            <li
+              key={i}
+              className="flex gap-2 rounded-lg border border-temple-border/50 bg-temple-bg/40 px-3 py-2.5 text-sm text-monk-text/90"
+            >
+              <span className="text-solana-green">→</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <details className="mt-6 group">
+        <summary className="cursor-pointer list-none text-sm text-monk-muted transition-colors hover:text-monk-text [&::-webkit-details-marker]:hidden">
+          <span className="inline-flex items-center gap-2">
+            <span className="text-solana-purple">+</span>
+            Data limitations ({verdict.data_limitations.length})
+          </span>
+        </summary>
+        <ul className="mt-3 space-y-1.5 rounded-lg border border-temple-border/40 bg-temple-bg/30 px-4 py-3">
+          {verdict.data_limitations.map((item, i) => (
+            <li key={i} className="text-sm text-monk-muted">
+              — {item}
+            </li>
+          ))}
+        </ul>
+      </details>
+
+      <p className="mt-6 text-xs leading-relaxed text-monk-muted/60">
+        {verdict.disclaimer}
+      </p>
     </section>
   );
 }

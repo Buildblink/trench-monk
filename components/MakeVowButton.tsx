@@ -1,20 +1,26 @@
+import { SectionHeader } from "@/components/ui/SectionHeader";
+
 export function MakeVowButton() {
   return (
-    <div className="rounded-2xl border border-solana-green/30 bg-gradient-to-r from-solana-green/5 to-solana-purple/5 p-6 text-center">
-      <p className="mb-4 text-sm text-monk-muted">
-        Agree or disagree with the Monk. Public Vows resolve after 1H / 3H / 24H.
-      </p>
+    <section className="relative overflow-hidden rounded-2xl border border-dashed border-solana-green/35 bg-gradient-to-br from-solana-green/5 via-temple-surface/40 to-solana-purple/5 px-6 py-8 text-center">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-solana-green/5 via-transparent to-transparent" />
+      <SectionHeader
+        align="center"
+        eyebrow="Coming in Phase 4"
+        title="Make Your Vow"
+        subtitle="Agree or disagree with the Monk. Public Vows resolve after 1H / 3H / 24H."
+      />
       <button
         type="button"
         disabled
-        className="cursor-not-allowed rounded-xl border border-solana-green/40 bg-solana-green/10 px-10 py-3.5 text-sm font-semibold text-solana-green opacity-70"
+        className="relative cursor-not-allowed rounded-xl border border-solana-green/50 bg-solana-green/10 px-12 py-4 text-base font-semibold text-solana-green/80 shadow-lg shadow-solana-green/5"
         title="Available in Phase 4"
       >
         Make Your Vow
       </button>
-      <p className="mt-3 text-xs text-monk-muted/60">
-        Wallet connect & Vow submission — Phase 4
+      <p className="relative mt-4 text-xs text-monk-muted/70">
+        Wallet connect &amp; vow submission — Phase 4
       </p>
-    </div>
+    </section>
   );
 }

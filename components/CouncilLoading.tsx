@@ -6,23 +6,16 @@ export function CouncilLoading({
   message = "The Monk Council is reading the token...",
 }: CouncilLoadingProps) {
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-solana-purple/30 bg-temple-surface/50 p-6 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-solana-purple/40 bg-solana-purple/10">
-          <span className="animate-pulse text-xl">🧘</span>
-        </div>
-        <p className="text-sm text-monk-muted">{message}</p>
-        <p className="mt-2 text-xs text-monk-muted/60">
-          Dev Detective · Wallet Monk · Narrative Oracle · Final Monk
-        </p>
+    <div className="rounded-2xl border border-solana-purple/25 bg-temple-surface/40 px-6 py-10 text-center">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-candle-orange/40 bg-candle-orange/10 text-2xl animate-pulse">
+        🧘
       </div>
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-36 animate-pulse rounded-xl border border-temple-border bg-temple-surface/40"
-          />
-        ))}
+      <p className="text-base text-monk-muted">{message}</p>
+      <p className="mt-2 text-xs text-monk-muted/60">
+        Dev Detective · Wallet Monk · Narrative Oracle · Final Monk
+      </p>
+      <div className="mx-auto mt-6 h-1 max-w-xs overflow-hidden rounded-full bg-temple-elevated">
+        <div className="h-full w-2/3 animate-pulse rounded-full bg-gradient-to-r from-solana-purple to-solana-green" />
       </div>
     </div>
   );

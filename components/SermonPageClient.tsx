@@ -95,25 +95,25 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
   }, [tokenAddress, fetchCouncil]);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <div className="mb-8">
+    <div className="mx-auto max-w-4xl overflow-x-hidden px-4 py-8 sm:px-6 sm:py-10">
+      <header className="mb-8">
         <Link
           href="/"
           className="text-sm text-monk-muted transition-colors hover:text-solana-green"
         >
           ← Back to Temple
         </Link>
-        <h1 className="mt-4 text-2xl font-bold text-monk-text">
+        <h1 className="mt-4 text-2xl font-bold text-monk-text sm:text-3xl">
           <span className="text-gradient-solana">Sermon</span>
         </h1>
-        <p className="mt-1 text-sm text-monk-muted">
+        <p className="mt-1 text-sm text-monk-muted sm:text-base">
           The Monk Council reads the token. The chart has not yet spoken.
         </p>
-      </div>
+      </header>
 
       {scanLoading && (
         <div className="space-y-6">
-          <div className="h-48 animate-pulse rounded-2xl border border-temple-border bg-temple-surface/50" />
+          <div className="h-40 animate-pulse rounded-2xl border border-temple-border bg-temple-surface/50 sm:h-48" />
           <CouncilLoading message="Summoning data from DexScreener..." />
         </div>
       )}
@@ -131,7 +131,7 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
       )}
 
       {tokenData && !scanLoading && (
-        <div className="space-y-8">
+        <div className="space-y-10">
           <TokenSummaryCard data={tokenData} />
 
           {councilLoading && (
@@ -147,29 +147,28 @@ export function SermonPageClient({ tokenAddress }: SermonPageClientProps) {
 
           {council && !councilLoading && (
             <>
+              <MonkVerdict verdict={council.finalMonk} />
+
               <DataCoverage
                 available={council.dataCoverage.available}
                 missing={council.dataCoverage.missing}
                 contextTiers={council.dataCoverage.contextTiers}
-                pairLiquidityDisclaimer={
-                  council.dataCoverage.pairLiquidityDisclaimer
-                }
-                agents={{
-                  devDetective: council.devDetective,
-                  walletMonk: council.walletMonk,
-                  narrativeOracle: council.narrativeOracle,
-                }}
               />
+
+              <KarmaMapLite council={council} />
+
               <CouncilDebate
                 devDetective={council.devDetective}
                 walletMonk={council.walletMonk}
                 narrativeOracle={council.narrativeOracle}
               />
-              <MonkVerdict verdict={council.finalMonk} />
             </>
           )}
 
-          <KarmaMapLite council={council} />
+          {!council && !councilLoading && !councilError && (
+            <KarmaMapLite council={null} />
+          )}
+
           <MakeVowButton />
         </div>
       )}
