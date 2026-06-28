@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-temple-bg: #0a0a0f;
+  --color-temple-surface: #12121a;
+  --color-temple-elevated: #1a1a26;
+  --color-temple-border: #2a2a3d;
+  --color-solana-purple: #9945ff;
+  --color-solana-green: #14f195;
+  --color-candle-orange: #ff8c42;
+  --color-candle-glow: #ffb347;
+  --color-monk-muted: #8b8ba3;
+  --color-monk-text: #e8e8f0;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-temple-bg);
+  color: var(--color-monk-text);
+  min-height: 100vh;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-solana-purple) 40%, transparent);
+}
+
+.glow-purple {
+  box-shadow: 0 0 40px color-mix(in srgb, var(--color-solana-purple) 25%, transparent);
+}
+
+.glow-green {
+  box-shadow: 0 0 40px color-mix(in srgb, var(--color-solana-green) 20%, transparent);
+}
+
+.glow-candle {
+  box-shadow: 0 0 30px color-mix(in srgb, var(--color-candle-orange) 30%, transparent);
+}
+
+.text-gradient-solana {
+  background: linear-gradient(135deg, var(--color-solana-purple), var(--color-solana-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.temple-grid-bg {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-solana-purple) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-solana-purple) 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.candle-accent {
+  border-left: 3px solid var(--color-candle-orange);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
